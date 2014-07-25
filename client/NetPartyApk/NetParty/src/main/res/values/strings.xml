@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- FaceBook section -->
+
+    <string name="app_id">671682812926726</string>
+    <string name="app_secret">a8da8a2f6931d33ee29da7bc8ac4a5f5</string>
+    <string name="hash_key">IEcNhKTnE+RhEvs+v25DBbTPdy8=</string>
+
+    <!-- ################# -->
+
+
+    <string name="app_name">NetParty</string>
+    <string name="network">Network: </string>
+    <string name="facebook">FaceBook</string>
+    <string name="user_name">Username</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="error_title">Error</string>
+    <string name="login_error_msg">Wrong login or password. Pleas, check and try again.</string>
+    <string name="add_acc_dialog_msg">Welcome %1$s!
+        Corresponding account hasn’t relationship with other social networks yet.
+        Would you like to link it with other social networks accounts?</string>
+    <string name="add_acc_dialog_tittle">Add social network accounts?</string>
+    <string name="sure">Sure</string>
+    <string name="later">Later</string>
+    <string name="never">Never</string>
+
+    <string name="login_dialog_title">Add accounts</string>
+    <string name="login_dialog_msg">Please select the social network and login there to create the common account.</string>
+    <string name="add_account">Add Account</string>
+    <string name="account_added">%1$s account successfully added.</string>
+    <string name="finish">Finish</string>
+    <string name="warning">Warning!</string>
+    <string name="ok">OK</string>
+    <string name="same_acc_added">The same account has been already added.</string>
+
+    <string name="welcome">Welcome to NetParty APK!</string>
+
+</resources>

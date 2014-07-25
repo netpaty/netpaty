@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.path="$MODULE_DIR$/../FaceBookSDK" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="NetPartyApk" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/build/classes/main" />
+    <output-test url="file://$MODULE_DIR$/build/classes/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../FaceBookSDK">
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/r/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/aidl/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/buildConfig/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/rs/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/res/rs/debug" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/r/test/debug" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/aidl/test/debug" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/buildConfig/test/debug" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/source/rs/test/debug" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/res/rs/test/debug" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/debug/aidl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/debug/assets" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/debug/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/debug/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/debug/rs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/debug/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/debug/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/main/aidl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/main/assets" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/main/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/main/rs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/main/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/instrumentTest/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/instrumentTest/assets" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/instrumentTest/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/instrumentTest/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/instrumentTest/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/instrumentTest/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../FaceBookSDK/src/instrumentTest/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/apk" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/assets" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/bundles" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/classes" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/dependency-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/incremental" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/libs" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/manifests" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/res" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/symbols" />
+      <excludeFolder url="file://$MODULE_DIR$/../FaceBookSDK/build/tmp" />
+    </content>
+    <orderEntry type="jdk" jdkName="Android 4.4 Platform (1)" jdkType="Android SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="ComAndroidSupportAppcompatV71910.aar" level="project" />
+  </component>
+</module>
+
