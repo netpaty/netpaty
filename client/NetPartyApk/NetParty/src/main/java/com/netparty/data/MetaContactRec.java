@@ -1,6 +1,7 @@
 package com.netparty.data;
 
 
+import com.netparty.enums.SocialNetwork;
 import com.netparty.interfaces.MetaContact;
 import com.netparty.interfaces.SocialNetAccount;
 
@@ -49,5 +50,21 @@ public class MetaContactRec implements MetaContact {
     @Override
     public void setNotifyFlag(boolean flag) {
         this.notifyFlag = flag;
+    }
+
+    @Override
+    public boolean hasGoogleAccount() {
+        for(SocialNetAccount account: accounts){
+            if(account.getNet().equals(SocialNetwork.GOOGLE)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean containAccount(SocialNetAccount account) {
+        for(SocialNetAccount acc: accounts){
+            if(acc.getId().equals(account.getId())) return true;
+        }
+        return false;
     }
 }

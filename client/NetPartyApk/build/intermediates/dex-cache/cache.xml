@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="D:\NetParty\trunk\client\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\bolts-cb7b09bd20750206d7892f55d87eed09d74eadd5.jar"
+        jar="D:\NetParty\trunk\client\NetPartyApk\build\intermediates\exploded-aar\NetPartyApk.libraries\facebook\unspecified\libs\bolts.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="1e5ba33c837d05dcca9dc40a0ab458f8599d7aef"/>
+    <item
+        dex="D:\NetParty\trunk\client\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\classes-e55aecb5f3596d13359144813e52274e2ceef1ed.jar"
+        jar="D:\NetParty\trunk\client\NetPartyApk\build\intermediates\exploded-aar\com.google.android.gms\play-services\5.0.77\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="b6a82434c1eca686607867cd906bcc80ed987837"/>
+    <item
+        dex="D:\NetParty\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\support-v4-19.1.0-74441d846a7bedc47ae1a663c683e86c5151ae2f.jar"
+        jar="D:\adt-bundle-windows-x86-20140702\sdk\extras\android\m2repository\com\android\support\support-v4\19.1.0\support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
+    <item
+        dex="D:\NetParty\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\classes-2a67f3cad480672eb2102b6e074553d5c4de5164.jar"
+        jar="D:\NetParty\NetPartyApk\build\intermediates\exploded-aar\com.google.android.gms\play-services\5.0.77\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="b6a82434c1eca686607867cd906bcc80ed987837"/>
+    <item
+        dex="D:\NetParty\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\classes-81cba516aed29c2d5d6ddff1757793074d7bf087.jar"
+        jar="D:\NetParty\NetPartyApk\build\intermediates\exploded-aar\com.android.support\appcompat-v7\19.1.0\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="D:\NetParty\trunk\client\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\classes-2724fc66f35799f95647e0c2ec4632eef1ec1c09.jar"
+        jar="D:\NetParty\trunk\client\NetPartyApk\build\intermediates\exploded-aar\NetPartyApk.libraries\facebook\unspecified\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="80a2fd0d68a089f344f6f9f3aabe570307121935"/>
+    <item
+        dex="D:\NetParty\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\classes-761e7d1d6e4eef88ce5a3df8c4b15d9a8592bd51.jar"
+        jar="D:\NetParty\NetPartyApk\build\intermediates\exploded-aar\NetPartyApk.libraries\facebook\unspecified\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="708b49fbcc963753f615d6ab21194831b742a83c"/>
+    <item
+        dex="D:\NetParty\trunk\client\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\classes-bd5e42c85414be3721c9bc49c07bb143aa94186a.jar"
+        jar="D:\NetParty\trunk\client\NetPartyApk\build\intermediates\exploded-aar\com.android.support\appcompat-v7\19.1.0\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="D:\NetParty\NetPartyApk\NetParty\build\intermediates\pre-dexed\debug\bolts-25d8a9be40dc2f498714666c011e5dae2499ec17.jar"
+        jar="D:\NetParty\NetPartyApk\build\intermediates\exploded-aar\NetPartyApk.libraries\facebook\unspecified\libs\bolts.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="1e5ba33c837d05dcca9dc40a0ab458f8599d7aef"/>
+
+</pre-dex-items>

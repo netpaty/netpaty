@@ -1,13 +1,12 @@
 package com.netparty.interfaces;
 
 
-import com.netparty.enums.SocialNetworks;
+import com.netparty.enums.SocialNetwork;
 
 public interface SocialNetAccount {
     String getId();
-    String getLogin();
-    String getPassword();
-    SocialNetworks getNet();
+    SocialNetwork getNet();
+    String getUserName();
     void setId(String id);
 
 }

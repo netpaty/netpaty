@@ -7,12 +7,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.FragmentActivity;
 
 
 import com.netparty.services.NPService;
 
 
-public abstract class AbstractActivity extends Activity {
+public abstract class AbstractActivity extends FragmentActivity {
 
     NPService service = null;
 
@@ -32,9 +33,6 @@ public abstract class AbstractActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bindService(new Intent(this, NPService.class), connection, Context.BIND_AUTO_CREATE);
-        
-
-
     }
 
     protected ServiceConnection connection = new ServiceConnection() {
@@ -79,5 +77,6 @@ public abstract class AbstractActivity extends Activity {
     protected void onDestroy(){
         isActive = false;
         super.onDestroy();
+        unbindService(connection);
     }
 }

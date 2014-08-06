@@ -1,35 +1,34 @@
 package com.netparty.data;
 
 
-import android.support.v7.appcompat.R;
-
-import com.netparty.enums.SocialNetworks;
-
+import com.netparty.enums.SocialNetwork;
+import com.netparty.interfaces.SocialNetAccount;
 
 
-public class SocialNetAccountRec implements com.netparty.interfaces.SocialNetAccount {
 
-    private SocialNetworks network;
+public class SocialNetAccountRec implements SocialNetAccount {
+
+    private SocialNetwork netWork;
     private String id = "";
-    private String login = "";
-    private String password = "";
+    String userName = "";
 
 
-    public SocialNetAccountRec(SocialNetworks network, String login, String password){
-        this.network = network;
-        this.login = login;
-        this.password = password;
 
-    }
-
-    public SocialNetAccountRec(SocialNetworks network, String login,
-                               String password, String id){
-        this.network = network;
-        this.login = login;
-        this.password = password;
+    public SocialNetAccountRec(SocialNetwork netWork, String id){
+        this.netWork = netWork;
         this.id = id;
 
+
     }
+
+    public SocialNetAccountRec(SocialNetwork netWork, String id, String userName){
+        this.netWork = netWork;
+        this.id = id;
+        this.userName = userName;
+
+
+    }
+
 
 
     @Override
@@ -38,18 +37,13 @@ public class SocialNetAccountRec implements com.netparty.interfaces.SocialNetAcc
     }
 
     @Override
-    public String getLogin() {
-        return login;
+    public SocialNetwork getNet() {
+        return netWork;
     }
 
     @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public SocialNetworks getNet() {
-        return network;
+    public String getUserName() {
+        return userName;
     }
 
     @Override

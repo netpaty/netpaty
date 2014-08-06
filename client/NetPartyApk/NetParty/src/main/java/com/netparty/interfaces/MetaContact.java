@@ -10,4 +10,6 @@ public interface MetaContact {
     boolean getNotifyFlag();
     void setId(String id);
     void setNotifyFlag(boolean flag);
+    boolean hasGoogleAccount();
+    boolean containAccount(SocialNetAccount account);
 }

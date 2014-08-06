@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/NetParty/NetParty.iml" filepath="$PROJECT_DIR$/NetParty/NetParty.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NetPartyApk.iml" filepath="$PROJECT_DIR$/NetPartyApk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libraries/facebook/facebook.iml" filepath="$PROJECT_DIR$/libraries/facebook/facebook.iml" />
+    </modules>
+  </component>
+</project>
+

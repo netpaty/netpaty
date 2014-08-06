@@ -24,8 +24,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 + Names.DB_FIELD_ID + " integer primary key autoincrement,"
                 + Names.DB_FIELD_NETWORK_ID + " text,"
                 + Names.DB_FIELD_NETWORK_TYPE + " text,"
-                + Names.DB_FIELD_LOGIN + " text,"
-                + Names.DB_FIELD_PASSWORD + " text,"
+                + Names.DB_FIELD_USER_NAME + " text,"
                 + Names.DB_FIELD_USER_ID + " text);");
 
 
