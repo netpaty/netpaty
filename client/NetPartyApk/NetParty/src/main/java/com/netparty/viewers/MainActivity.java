@@ -119,7 +119,6 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
                         mConnectionResult.startResolutionForResult(MainActivity.this, LoginActivity.REQUEST_CODE_RESOLVE_ERR);
 
                     } catch (IntentSender.SendIntentException e) {
-
                         if(getService() != null) getService().getPlusClient().connect();
                     }
                 }
