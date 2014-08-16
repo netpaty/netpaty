@@ -1,15 +1,18 @@
 package com.netparty.viewers;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 
 
+import com.facebook.Session;
 import com.netparty.services.NPService;
 
 
@@ -27,7 +30,9 @@ public abstract class AbstractActivity extends FragmentActivity {
         return service;
     }
 
-    protected abstract void onServiceConnected();
+    protected void onServiceConnected(){
+        registerReceiver(googleEventReceiver, new IntentFilter(NPService.GOOGLE_EVENT));
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,15 @@ public abstract class AbstractActivity extends FragmentActivity {
             finish();
         }
     };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(Session.getActiveSession() != null) Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+        if (requestCode == LoginActivity.REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {
+            if(getService() != null && getService().getPlusClient() != null) getService().getPlusClient().connect();
+        }
+    }
 
     @Override
     protected void onResume(){
@@ -77,6 +91,42 @@ public abstract class AbstractActivity extends FragmentActivity {
     protected void onDestroy(){
         isActive = false;
         super.onDestroy();
+        unregisterGoogleReceiver();
         unbindService(connection);
     }
+
+    private BroadcastReceiver googleEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String event = intent.getStringExtra(NPService.GOOGLE_EVENT);
+            if(event.equals(NPService.GOOGLE_CONNECT)){
+                onGoogleConnected();
+            }
+            else
+            if (event.equals(NPService.GOOGLE_DISCONNECT)){
+                onGoogleDisconnected();
+            }
+            else
+            if (event.equals(NPService.GOOGLE_CONNECTION_FAILED)){
+                onGoogleConnectionFailed();
+            }
+        }
+    };
+
+    protected abstract void onGoogleConnected();
+
+    protected abstract void onGoogleDisconnected();
+
+    protected abstract void onGoogleConnectionFailed();
+
+    protected void unregisterGoogleReceiver(){
+        try{
+            unregisterReceiver(googleEventReceiver);
+        }
+        catch (IllegalArgumentException e){
+
+        }
+    }
+
+
 }

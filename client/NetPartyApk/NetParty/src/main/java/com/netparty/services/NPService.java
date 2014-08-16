@@ -66,7 +66,7 @@ public class NPService extends Service {
         plusClient = new PlusClient.Builder(this, googleCallbacks, googleConFailedListener)
                 .setActions("http://schemas.google.com/AddActivity",
                         "http://schemas.google.com/BuyActivity")
-                .setScopes(Scopes.PLUS_LOGIN)
+                .setScopes(Scopes.PLUS_LOGIN, Scopes.PLUS_ME ,"https://www.googleapis.com/auth/userinfo.email")
 
                 .build();
     }
@@ -91,7 +91,7 @@ public class NPService extends Service {
 
         @Override
         public void onDisconnected() {
-            Log.e("tag", "disconnect ++++++++++++++++");
+
             sendEvent(GOOGLE_DISCONNECT);
         }
     };

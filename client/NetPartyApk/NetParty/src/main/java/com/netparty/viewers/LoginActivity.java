@@ -5,12 +5,9 @@ package com.netparty.viewers;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -27,12 +24,11 @@ import com.google.android.gms.plus.PlusClient;
 
 
 import com.netparty.R;
+import com.netparty.data.AccountRec;
 import com.netparty.data.MetaContactRec;
-import com.netparty.data.SocialNetAccountRec;
 import com.netparty.enums.SocialNetwork;
+import com.netparty.interfaces.Account;
 import com.netparty.interfaces.MetaContact;
-import com.netparty.interfaces.SocialNetAccount;
-import com.netparty.services.NPService;
 import com.netparty.utils.db.DataBaseAdapter;
 
 import com.facebook.*;
@@ -68,7 +64,7 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
 
     @Override
     protected void onServiceConnected() {
-
+        super.onServiceConnected();
         mPlusClient = getService().getPlusClient();
 
         String lastMCId = preferences.getString(LAST_MC_ID, "");
@@ -88,19 +84,12 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(saveInstanceState);
 
-        registerReceiver(googleEventReceiver, new IntentFilter(NPService.GOOGLE_EVENT));
-
         preferences = this.getSharedPreferences(PREFERENCES,
                 Activity.MODE_PRIVATE);
         editor = preferences.edit();
 
         mConnectionProgressDialog = new ProgressDialog(this);
         mConnectionProgressDialog.setMessage("Signing in...");
-
-
-
-
-
 
         plusButton = (SignInButton)findViewById(R.id.sign_in_button);
 
@@ -150,8 +139,41 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     public void onDestroy() {
         super.onDestroy();
         uiHelper.onDestroy();
-        unregisterReceiver(googleEventReceiver);
+        unregisterGoogleReceiver();
 
+    }
+
+    @Override
+    protected void onGoogleConnected() {
+        mConnectionProgressDialog.dismiss();
+        Log.e("tag", "Connected " + mPlusClient.getAccountName() + " " + mPlusClient.getCurrentPerson() + "  " + mPlusClient.isConnected());
+
+        onSocialNetworkLogin(new AccountRec(SocialNetwork.GOOGLE, mPlusClient.getAccountName(),
+                mPlusClient.getCurrentPerson().getDisplayName()));
+        plusButton.setVisibility(View.GONE);
+        googleSignOutBtn.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onGoogleDisconnected() {
+
+    }
+
+    @Override
+    protected void onGoogleConnectionFailed() {
+        mConnectionProgressDialog.dismiss();
+        mConnectionResult = getService().getGoogleConnectionResult();
+        if(mConnectionResult != null) {
+            Log.e("tag", "FAILED " + mConnectionResult.toString());
+            try {
+                Log.e("tag", "LoginActivity startResolutionForResult");
+                mConnectionResult.startResolutionForResult(LoginActivity.this, REQUEST_CODE_RESOLVE_ERR);
+                mConnectionProgressDialog.show();
+            } catch (IntentSender.SendIntentException e) {
+                mConnectionProgressDialog.show();
+                mPlusClient.connect();
+            }
+        }
     }
 
     @Override
@@ -161,20 +183,8 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     }
 
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {
-            mConnectionResult = null;
-            mPlusClient.connect();
-        }
-    }
 
-
-
-
-    private void onSocialNetworkLogin(SocialNetAccount account){
+    private void onSocialNetworkLogin(Account account){
         if(processLogin) {
             if (firstSignIn) {
                 MetaContact mc = dbAdapter.getMetaContact(account);
@@ -187,7 +197,7 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
         }
     }
 
-    private void processMetaContact(MetaContact mc, SocialNetAccount acc){
+    private void processMetaContact(MetaContact mc, Account acc){
         if(mc != null) {
             if(acc != null && !mc.containAccount(acc)) mc.addAccount(acc);
             getService().setMetaContact(mc);
@@ -213,7 +223,7 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
 
 
 
-    private void showAddAccDialog(final SocialNetAccount account){
+    private void showAddAccDialog(final Account account){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.add_acc_dialog_tittle);
         String welcomeMsg = String.format(getResources().getString(R.string.add_acc_dialog_msg),
@@ -252,13 +262,14 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     private void loginNetParty(){
         MetaContact mc = getService().getMetaContact();
         if(mc != null && mc.getAccounts().size()>0){
+            unregisterGoogleReceiver();
             dbAdapter.updateOrAddMetaContact(mc);
-
             editor.putString(LAST_MC_ID, mc.getId());
             editor.commit();
+            finish();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
-            finish();
+
         }
         else Log.e("tag", "No MC or Account!");
     }
@@ -276,50 +287,11 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
                         if (user != null) {
-                            onSocialNetworkLogin(new SocialNetAccountRec(SocialNetwork.FACEBOOK, user.getId(), user.getName()));
+                            onSocialNetworkLogin(new AccountRec(SocialNetwork.FACEBOOK, user.getId(), user.getName()));
                         }
                     }
                 }).executeAsync();
 
-            }
-        }
-    };
-
-
-    //Google+
-
-    private BroadcastReceiver googleEventReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String event = intent.getStringExtra(NPService.GOOGLE_EVENT);
-            if(event.equals(NPService.GOOGLE_CONNECT)){
-                mConnectionProgressDialog.dismiss();
-                Log.e("tag", "Connected " + mPlusClient.getAccountName() + "  " + mPlusClient.isConnected());
-
-                onSocialNetworkLogin(new SocialNetAccountRec(SocialNetwork.GOOGLE, mPlusClient.getAccountName(),
-                        mPlusClient.getCurrentPerson().getDisplayName()));
-                plusButton.setVisibility(View.GONE);
-                googleSignOutBtn.setVisibility(View.VISIBLE);
-            }
-            else
-            if (event.equals(NPService.GOOGLE_DISCONNECT)){
-
-            }
-            else
-            if (event.equals(NPService.GOOGLE_CONNECTION_FAILED)){
-                mConnectionProgressDialog.dismiss();
-                mConnectionResult = getService().getGoogleConnectionResult();
-                if(mConnectionResult != null) {
-                    Log.e("tag", "FAILED " + mConnectionResult.toString());
-                    try {
-                        Log.e("tag", "startResolutionForResult");
-                        mConnectionResult.startResolutionForResult(LoginActivity.this, REQUEST_CODE_RESOLVE_ERR);
-                        mConnectionProgressDialog.show();
-                    } catch (IntentSender.SendIntentException e) {
-                        mConnectionProgressDialog.show();
-                        mPlusClient.connect();
-                    }
-                }
             }
         }
     };

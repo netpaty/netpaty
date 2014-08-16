@@ -2,8 +2,6 @@ package com.netparty.viewers;
 
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,18 +12,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
-import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 import com.netparty.R;
-import com.netparty.data.SimpleFriendData;
-import com.netparty.data.SocialNetAccountRec;
 import com.netparty.enums.SocialNetwork;
-import com.netparty.interfaces.SocialNetAccount;
+import com.netparty.interfaces.Account;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,6 +80,21 @@ public class AccountActivity extends AbstractActivity {
     }
 
     @Override
+    protected void onGoogleConnected() {
+
+    }
+
+    @Override
+    protected void onGoogleDisconnected() {
+
+    }
+
+    @Override
+    protected void onGoogleConnectionFailed() {
+
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         uiHelper.onSaveInstanceState(outState);
@@ -95,11 +103,11 @@ public class AccountActivity extends AbstractActivity {
     private class AccountsAdapter extends BaseAdapter {
 
         Context context;
-        ArrayList<SocialNetAccount> list;
+        ArrayList<Account> list;
         LayoutInflater inflater;
         View view;
 
-        public AccountsAdapter(Context context, ArrayList<SocialNetAccount> list){
+        public AccountsAdapter(Context context, ArrayList<Account> list){
             this.context = context;
             this.list = list;
             this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -113,12 +121,19 @@ public class AccountActivity extends AbstractActivity {
 
         @Override
         public Object getItem(int position) {
-            return null;
+            return list.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            long id = 0;
+            try{
+                id = Long.valueOf(list.get(position).getId());
+            }
+            catch (Exception e){
+                Log.e("tag", e.getMessage());
+            }
+            return id;
         }
 
         @Override

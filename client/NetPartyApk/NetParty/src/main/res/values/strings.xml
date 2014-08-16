@@ -34,4 +34,8 @@
 
     <string name="welcome">Welcome to NetParty APK!</string>
 
+    <string name="turn_off">Sign out &#xf011;</string>
+
+    <string name="contact_tittle">MetaContact Details</string>
+
 </resources>

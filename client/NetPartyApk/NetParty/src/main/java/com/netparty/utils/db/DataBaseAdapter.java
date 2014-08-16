@@ -7,12 +7,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.netparty.data.AccountRec;
 import com.netparty.data.MetaContactRec;
 import com.netparty.data.Names;
-import com.netparty.data.SocialNetAccountRec;
 import com.netparty.enums.SocialNetwork;
+import com.netparty.interfaces.Account;
 import com.netparty.interfaces.MetaContact;
-import com.netparty.interfaces.SocialNetAccount;
 
 public class DataBaseAdapter {
     DBHelper helper;
@@ -49,7 +49,7 @@ public class DataBaseAdapter {
             int netTypeColIndex = cursor2.getColumnIndex(Names.DB_FIELD_NETWORK_TYPE);
             int userNameColIndex = cursor2.getColumnIndex(Names.DB_FIELD_USER_NAME);
             do{
-                mc.addAccount(new SocialNetAccountRec(
+                mc.addAccount(new AccountRec(
                         SocialNetwork.fromString(cursor2.getString(netTypeColIndex)),
                         cursor2.getString(networkIdColIndex), cursor2.getString(userNameColIndex)));
             }
@@ -58,7 +58,7 @@ public class DataBaseAdapter {
         return mc;
     }
 
-    public MetaContact getMetaContact(SocialNetAccount account){
+    public MetaContact getMetaContact(Account account){
 
         String[] columns = {Names.DB_FIELD_NETWORK_ID, Names.DB_FIELD_NETWORK_TYPE, Names.DB_FIELD_USER_ID, Names.DB_FIELD_USER_NAME};
         String selection = Names.DB_FIELD_NETWORK_ID + "='" + account.getId() + "'" +
@@ -84,7 +84,7 @@ public class DataBaseAdapter {
                 int netTypeColIndex = cursor1.getColumnIndex(Names.DB_FIELD_NETWORK_TYPE);
                 int userNameColIndex = cursor1.getColumnIndex(Names.DB_FIELD_USER_NAME);
                 do{
-                    metaContact.addAccount(new SocialNetAccountRec(
+                    metaContact.addAccount(new AccountRec(
                             SocialNetwork.fromString(cursor1.getString(netTypeColIndex)),
                             cursor1.getString(networkIdColIndex), cursor1.getString(userNameColIndex)));
                 }
@@ -100,7 +100,7 @@ public class DataBaseAdapter {
         cv.put(Names.DB_FIELD_NOTIFICATION_FLAG, mc.getNotifyFlag()?1:0);
         long rowID = db.insert(USERS_TABLE, null, cv);
         mc.setId(String.valueOf(rowID));
-        for (SocialNetAccount account: mc.getAccounts()){
+        for (Account account: mc.getAccounts()){
             cv.clear();
             cv.put(Names.DB_FIELD_USER_ID, String.valueOf(rowID));
             cv.put(Names.DB_FIELD_NETWORK_TYPE, account.getNet().getName());
@@ -120,7 +120,7 @@ public class DataBaseAdapter {
 
         Log.e("tag", "size=" + mc.getAccounts().size());
 
-        for (SocialNetAccount account: mc.getAccounts()){
+        for (Account account: mc.getAccounts()){
             String[] columns = {Names.DB_FIELD_NETWORK_ID, Names.DB_FIELD_NETWORK_TYPE, Names.DB_FIELD_USER_ID};
             String selection = Names.DB_FIELD_NETWORK_ID + "='" + account.getId() + "'" +
                     " AND " + Names.DB_FIELD_NETWORK_TYPE  + "='" + account.getNet().getName() + "'" +
