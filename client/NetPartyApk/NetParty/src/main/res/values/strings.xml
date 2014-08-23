@@ -30,11 +30,13 @@
     <string name="main_hint">Choose network to sign in with:</string>
     <string name="add_acc_hint">Choose network to add account:</string>
     <string name="accounts">Accounts: </string>
-    <string name="your_accounts">Your Accounts</string>
+    <string name="my_accounts">My Accounts</string>
 
     <string name="welcome">Welcome to NetParty APK!</string>
 
-    <string name="turn_off">Sign out &#xf011;</string>
+    <!--<string name="turn_off">Sign out &#xf011;</string>-->
+
+    <string name="turn_off">Sign out </string>
 
     <string name="contact_tittle">MetaContact Details</string>
 

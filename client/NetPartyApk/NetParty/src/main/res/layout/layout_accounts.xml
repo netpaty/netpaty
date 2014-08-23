@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:textSize="28dp"
         android:textStyle="bold"
-        android:text="@string/your_accounts"
+        android:text="@string/my_accounts"
         android:gravity="center"
         android:paddingBottom="15dp"/>
 

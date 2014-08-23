@@ -67,7 +67,6 @@ public class NPService extends Service {
                 .setActions("http://schemas.google.com/AddActivity",
                         "http://schemas.google.com/BuyActivity")
                 .setScopes(Scopes.PLUS_LOGIN, Scopes.PLUS_ME ,"https://www.googleapis.com/auth/userinfo.email")
-
                 .build();
     }
 

@@ -12,6 +12,7 @@ import android.widget.ListView;
 
 import com.netparty.data.MetaContactRec;
 import com.netparty.interfaces.Account;
+import com.netparty.interfaces.RemoveItemListener;
 
 
 /**
@@ -20,21 +21,22 @@ import com.netparty.interfaces.Account;
 public class DragDropListView extends ListView {
 
     private Context context;
-
-
+    private OnTouchListener listener;
+    private OnTouchListener outUpListener;
+    private RemoveItemListener removeItemListener;
 
 
     public void setDragListener(OnTouchListener listener) {
         this.listener = listener;
     }
 
-    private OnTouchListener listener;
+
 
     public void setOutUpListener(OnTouchListener outUpListener) {
         this.outUpListener = outUpListener;
     }
 
-    private OnTouchListener outUpListener;
+
 
     public DragDropListView(Context context, AttributeSet set) {
         super(context, set);
@@ -42,11 +44,14 @@ public class DragDropListView extends ListView {
 
     }
 
+    public void setRemoveItemListener(RemoveItemListener removeItemListener) {
+        this.removeItemListener = removeItemListener;
+    }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent ev){
         super.onTouchEvent(ev);
-
             if (ev.getAction() == MotionEvent.ACTION_UP) {
                 Rect listRect = new Rect();
                 listRect.set(this.getLeft(), this.getTop(), this.getRight(), this.getBottom());
@@ -63,16 +68,14 @@ public class DragDropListView extends ListView {
         if(receivedItem != null) {
             Rect listRect = new Rect();
             listRect.set(this.getLeft(), this.getTop(), this.getRight(), this.getBottom());
-
             if (listRect.contains(x, y)) {
-
                 int position = getPositionOnPoint(x, y);
-                if (position > -1) {
+                if (position > -1 && !this.getAdapter().getItem(position).equals(receivedItem)) {
                     for (Account account : receivedItem.getAccounts()) {
                         ((MetaContactRec) this.getAdapter().getItem(position)).addAccount(account);
                     }
-
                     ((BaseAdapter) this.getAdapter()).notifyDataSetChanged();
+                    removeItemListener.removeItem(receivedItem);
                 }
             }
         }

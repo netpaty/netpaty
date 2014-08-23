@@ -99,7 +99,8 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
         googleSignOutBtn.setOnClickListener(this);
 
         faceBookLoginBtn = (LoginButton)findViewById(R.id.authButton);
-        faceBookLoginBtn.setReadPermissions(Arrays.asList("user_friends"));
+        faceBookLoginBtn.setReadPermissions(Arrays.asList("user_friends", "friends_online_presence",
+                "friends_online_presence"));
 
         hint = (TextView)findViewById(R.id.hint);
         loginBtn = (Button)findViewById(R.id.app_login);
