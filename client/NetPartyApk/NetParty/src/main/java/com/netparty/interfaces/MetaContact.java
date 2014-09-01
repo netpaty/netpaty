@@ -14,4 +14,5 @@ public interface MetaContact {
     void setNotifyFlag(boolean flag);
     boolean containAccount(Account account);
     boolean containAccount(SocialNetwork network);
+    String getAccountId(SocialNetwork network);
 }

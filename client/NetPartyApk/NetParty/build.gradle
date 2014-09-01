@@ -33,5 +33,5 @@ dependencies {
     compile files('libs/android-support-v4.jar')
 
     compile 'com.google.android.gms:play-services:5.+'
-
+    compile 'com.vk:androidsdk:+'
 }

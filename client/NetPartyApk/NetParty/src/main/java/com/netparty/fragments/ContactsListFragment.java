@@ -1,5 +1,6 @@
 package com.netparty.fragments;
 
+import android.app.Service;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,13 +32,19 @@ import com.netparty.data.AccountRec;
 import com.netparty.data.MetaContactRec;
 import com.netparty.enums.SocialNetwork;
 import com.netparty.interfaces.Account;
-import com.netparty.interfaces.MetaContact;
 import com.netparty.interfaces.RemoveItemListener;
+import com.netparty.services.NPService;
 import com.netparty.utils.web.WebUtils;
 import com.netparty.viewers.ContactDetailsDialog;
 import com.netparty.viewers.MainActivity;
 import com.netparty.views.DragDropListView;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,7 +52,7 @@ import java.util.Iterator;
 /**
  * Created by Valentin on 17.08.2014.
  */
-public class ContactsListFragment extends Fragment {
+public class ContactsListFragment extends AbstractFragment {
 
     private static final int SCROLL_DURATION = 70;
     private static final int SCROLL_DISTANCE = 30;
@@ -56,7 +63,6 @@ public class ContactsListFragment extends Fragment {
     private ImageView dragItemView;
     private MetaContactRec dragItem = null;
     private FriendsAdapter adapterLeft, adapterRight;
-    private MainActivity parentActivity = null;
     private ArrayList<MetaContactRec> friendsList;
     private RelativeLayout mContainer;
     private boolean isScrolling = false;
@@ -71,16 +77,8 @@ public class ContactsListFragment extends Fragment {
         dragItemView = (ImageView)contentView.findViewById(R.id.drag_image);
 
         mContainer = (RelativeLayout)contentView.findViewById(R.id.container);
-
-
-
-
         friendsLeft = (DragDropListView)contentView.findViewById(R.id.friends_left);
         friendsRight = (DragDropListView)contentView.findViewById(R.id.friends_right);
-
-        if(getActivity() instanceof MainActivity) parentActivity = (MainActivity)getActivity();
-
-
 
         friendsLeft.setDragListener(new DragListener(true));
         friendsRight.setDragListener(new DragListener(false));
@@ -131,7 +129,23 @@ public class ContactsListFragment extends Fragment {
         friendsLeft.setAdapter(adapterLeft);
         friendsRight.setAdapter(adapterRight);
 
+
+        if(((MainActivity)getActivity()).getService() != null) {
+            if (((MainActivity)getActivity()).getService().getPlusClient().isConnected())
+                loadGoogleFriends();
+            loadFacebookFriends();
+            loadVKFriends();
+        }
+
         return contentView;
+    }
+
+    @Override
+    public void onServiceConnected(Service service) {
+        if (((NPService)service).getPlusClient().isConnected())
+            loadGoogleFriends();
+        loadFacebookFriends();
+        loadVKFriends();
     }
 
     private class ScrollStateListener implements AbsListView.OnScrollListener{
@@ -287,7 +301,7 @@ public class ContactsListFragment extends Fragment {
 
         @Override
         public long getItemId(int position) {
-            return position;
+            return 0;
         }
 
         @Override
@@ -315,8 +329,8 @@ public class ContactsListFragment extends Fragment {
                 icon.setImageDrawable(getResources().getDrawable(R.drawable.google_circle));
             }
 
-            ImageView online = (ImageView)view.findViewById(R.id.online);
-            online.setImageDrawable(getResources().getDrawable(R.drawable.on_line));
+            //ImageView online = (ImageView)view.findViewById(R.id.online);
+            //online.setImageDrawable(getResources().getDrawable(R.drawable.on_line));
 
             if(list.get(position).getPhoto() != null) {
                 photo.setImageBitmap(list.get(position).getPhoto());
@@ -361,7 +375,6 @@ public class ContactsListFragment extends Fragment {
                     } finally {
                         persons.close();
                         updateAdapters();
-
                     }
                 } else {
                     Log.e("tag", "Error listing people: " + connectionResult.getErrorCode());
@@ -373,8 +386,6 @@ public class ContactsListFragment extends Fragment {
 
 
     public void loadFacebookFriends(){
-
-
         new Request(
                 Session.getActiveSession(),
                 "/me/taggable_friends",
@@ -396,6 +407,7 @@ public class ContactsListFragment extends Fragment {
                                 MetaContactRec mc = new MetaContactRec(false);
                                 mc.addAccount(new AccountRec(SocialNetwork.FACEBOOK, id, name, url));
                                 friendsList.add(mc);
+
                             }
                         }
                         catch ( Throwable t )
@@ -403,18 +415,48 @@ public class ContactsListFragment extends Fragment {
                             t.printStackTrace();
                             Log.e("tag", "catch" + t.getMessage());
                         }
-                        updateAdapters();
 
+                        updateAdapters();
 
                     }
 
                 }
         ).executeAsync();
+    }
 
+    public void loadVKFriends(){
+        String vkId = ((MainActivity)getActivity()).getService()
+                .getMetaContact().getAccountId(SocialNetwork.VK);
 
+        if(vkId != null) {
+            final VKRequest request = VKApi.friends().get(
+                    VKParameters.from(VKApiConst.USER_ID, vkId));
+            request.addExtraParameter("fields", "first_name,photo_50");
+            request.executeWithListener(new VKRequest.VKRequestListener() {
+                @Override
+                public void onComplete(VKResponse response) {
 
+                    try {
+                        JSONArray friends = response.json.getJSONObject("response").getJSONArray("items");
+                        for(int i = 0; i<friends.length(); i++){
+                            MetaContactRec mc = new MetaContactRec(false);
+                            mc.addAccount(new AccountRec(SocialNetwork.VK,
+                                    friends.getJSONObject(i).getString("id"),
+                                    friends.getJSONObject(i).getString("first_name") + " "
+                                    + friends.getJSONObject(i).getString("last_name"),
+                                    friends.getJSONObject(i).getString("photo_50")));
+                            friendsList.add(mc);
 
+                        }
+                        Log.e("tag", "VK friends" + friends.length());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    updateAdapters();
 
+                }
+            });
+        }
     }
 
     public void addContact(Account account){

@@ -3,10 +3,16 @@
 
     <!-- FaceBook section -->
 
-    <string name="app_id">671682812926726</string>
+    <string name="fb_app_id">671682812926726</string>
     <string name="app_secret">a8da8a2f6931d33ee29da7bc8ac4a5f5</string>
     <string name="hash_key">IEcNhKTnE+RhEvs+v25DBbTPdy8=</string>
 
+    <!-- ################# -->
+
+    <!-- VK section -->
+    <string name="vk_app_id">4388892</string>
+    <string name="login_with_vk">login with VK</string>
+    <string name="logout">logout</string>
     <!-- ################# -->
 
 

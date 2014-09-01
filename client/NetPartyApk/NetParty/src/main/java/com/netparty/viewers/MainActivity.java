@@ -3,10 +3,10 @@ package com.netparty.viewers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,14 +30,27 @@ import com.facebook.UiLifecycleHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.plus.PlusClient;
 import com.netparty.R;
-import com.netparty.data.MetaContactRec;
+import com.netparty.data.AccountRec;
+import com.netparty.enums.MenuItem;
+import com.netparty.fragments.AbstractFragment;
 import com.netparty.fragments.ContactsListFragment;
+import com.netparty.fragments.NewsFragment;
 import com.netparty.interfaces.MenuPanelShowListener;
 import com.netparty.enums.SocialNetwork;
 import com.netparty.interfaces.Account;
-import com.netparty.interfaces.MetaContact;
 import com.netparty.utils.web.WebUtils;
 import com.netparty.views.MenuPanel;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiUser;
+import com.vk.sdk.api.model.VKList;
+
 import java.util.ArrayList;
 import android.support.v4.app.FragmentManager;
 
@@ -73,6 +87,7 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
         menu = (ListView)menuPanel.findViewById(R.id.menu_list);
         adapter = new MenuAdapter();
         menu.setAdapter(adapter);
+
         adapter.notifyDataSetChanged();
 
 
@@ -156,6 +171,37 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
        // signOut.setTypeface(font);
         signOut.setOnClickListener(this);
 
+        menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (MenuItem.values()[position]){
+                    case CONTACTS:
+                        if(!(currentFragment instanceof ContactsListFragment)){
+                            transaction = fragmentManager.beginTransaction();
+                            currentFragment = new ContactsListFragment();
+                            transaction.replace(R.id.fragment_container, currentFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+                            focusCatcher.setVisibility(View.INVISIBLE);
+                            menuPanel.setX(-menuPanel.getWidth());
+
+                        }
+                        break;
+                    case NEWS:
+                        if(!(currentFragment instanceof NewsFragment)){
+                            transaction = fragmentManager.beginTransaction();
+                            currentFragment = new NewsFragment();
+                            transaction.replace(R.id.fragment_container, currentFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+                            focusCatcher.setVisibility(View.INVISIBLE);
+                            menuPanel.setX(-menuPanel.getWidth());
+                        }
+                        break;
+                }
+            }
+        });
+
 
 
     }
@@ -183,7 +229,7 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
     public void onDestroy() {
         super.onDestroy();
         uiHelper.onDestroy();
-        unregisterGoogleReceiver();
+        unregisterReceivers();
 
     }
 
@@ -220,6 +266,25 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
         }
     }
 
+    @Override
+    protected void onVKTokenExpired(VKAccessToken expiredToken) {
+
+    }
+
+    @Override
+    protected void onVKAccessDenied(VKError authorizationError) {
+
+    }
+
+    @Override
+    protected void onVKReceiveNewToken(VKAccessToken newToken) {
+        loadVKPhoto();
+    }
+
+    @Override
+    protected void onVKAcceptUserToken(VKAccessToken token) {
+        loadVKPhoto();
+    }
 
 
     @Override
@@ -257,6 +322,11 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
 
         }
 
+        if(firstAcc.getNet().equals(SocialNetwork.VK)
+                && VKSdk.isLoggedIn()){
+            loadVKPhoto();
+        }
+
         ArrayList<Account> accounts = getService().getMetaContact().getAccounts();
         for(Account account: accounts){
             if(account.getNet().equals(SocialNetwork.FACEBOOK)){
@@ -274,10 +344,7 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
             }
         }
 
-        if(currentFragment instanceof ContactsListFragment) {
-            if (getService().getPlusClient().isConnected()) ((ContactsListFragment)currentFragment).loadGoogleFriends();
-            ((ContactsListFragment)currentFragment).loadFacebookFriends();
-        }
+        ((AbstractFragment)currentFragment).onServiceConnected(getService());
 
         name.setText(getService().getMetaContact().getAccounts().get(0).getUserName());
 
@@ -304,6 +371,7 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
     }
 
     private void loadFacebookPhoto(){
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -318,6 +386,37 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
             }
 
         }).start();
+
+
+    }
+
+
+
+    private void loadVKPhoto(){
+          VKRequest r = VKApi.users().get();
+          r.addExtraParameter("user_id",firstAcc.getId());
+          r.addExtraParameter("fields","photo_100");
+          r.executeWithListener(new VKRequest.VKRequestListener() {
+          @Override
+          public void onComplete(VKResponse response) {
+                VKList<VKApiUser> users = (VKList<VKApiUser>)response.parsedModel;
+                    if(users != null && users.size()>0) {
+                        final VKApiUser user = users.get(0);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(user != null) firstAcc.setPhoto(WebUtils.loadPhoto(user.photo_100));
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ava.setImageBitmap(firstAcc.getPhoto());
+                                    }
+                                });
+                            }
+                        }).start();
+                    }
+                }
+          });
     }
 
 
@@ -334,7 +433,6 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
             if(Session.getActiveSession() != null && Session.getActiveSession().isOpened())
                 Session.getActiveSession().closeAndClearTokenInformation();
             if(getService().getPlusClient() != null && getService().getPlusClient().isConnected()) {
-
                 getService().getPlusClient().clearDefaultAccount();
                 getService().getPlusClient().revokeAccessAndDisconnect(new PlusClient.OnAccessRevokedListener() {
                     @Override
@@ -342,7 +440,9 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
 
                     }
                 });
-
+            }
+            if(VKSdk.isLoggedIn()){
+                VKSdk.logout();
             }
             Intent intent = new Intent().setClass(this, LoginActivity.class);
             startActivity(intent);
@@ -376,7 +476,7 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
 
         @Override
         public int getCount() {
-            return 4;
+            return MenuItem.values().length;
         }
 
         @Override
@@ -396,24 +496,10 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
             View view = inflater.inflate(R.layout.menu_item, null);
             ImageView icon = (ImageView)view.findViewById(R.id.icon);
             TextView text = (TextView)view.findViewById(R.id.text);
-            switch (position){
-                case 0:
-                    text.setText("Photo");
-                    icon.setImageDrawable(getResources().getDrawable(R.drawable.photo));
-                    break;
-                case 1:
-                    text.setText("Chat");
-                    icon.setImageDrawable(getResources().getDrawable(R.drawable.chat));
-                    break;
-                case 2:
-                    text.setText("Edit");
-                    icon.setImageDrawable(getResources().getDrawable(R.drawable.edit));
-                    break;
-                case 3:
-                    text.setText("Media");
-                    icon.setImageDrawable(getResources().getDrawable(R.drawable.media));
-                    break;
-            }
+            text.setText(MenuItem.values()[position].getName());
+            icon.setImageDrawable(
+                    getResources().getDrawable(
+                            MenuItem.values()[position].getDrawableId()));
             return view;
         }
     }
@@ -425,8 +511,5 @@ public class MainActivity extends AbstractActivity implements View.OnClickListen
             }
         }
     }
-
-
-
 
 }

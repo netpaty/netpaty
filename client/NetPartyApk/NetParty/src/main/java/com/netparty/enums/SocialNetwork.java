@@ -4,7 +4,8 @@ package com.netparty.enums;
 public enum SocialNetwork {
     FACEBOOK("FaceBook"),
     GOOGLE("Google+"),
-    TWITTER("Twitter");
+    TWITTER("Twitter"),
+    VK("vkontakte");
 
     private String name;
 

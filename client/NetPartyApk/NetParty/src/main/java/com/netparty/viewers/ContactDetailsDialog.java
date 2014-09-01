@@ -109,11 +109,12 @@ public class ContactDetailsDialog extends Dialog {
             final ImageView photo = (ImageView)view.findViewById(R.id.photo);
             name.setText(list.get(position).getUserName());
             final ImageView icon = (ImageView)view.findViewById(R.id.net_icon);
+            icon.setVisibility(View.VISIBLE);
             if(list.get(position).getNet().equals(SocialNetwork.FACEBOOK)) {
-                icon.setImageDrawable(context.getResources().getDrawable(R.drawable.facebook_ico));
+                icon.setImageDrawable(context.getResources().getDrawable(R.drawable.facebook_circle));
             }
             else {
-                icon.setImageDrawable(context.getResources().getDrawable(R.drawable.google_plus_ico));
+                icon.setImageDrawable(context.getResources().getDrawable(R.drawable.google_circle));
             }
             if(list.get(position).getPhoto() != null) {
                 photo.setImageBitmap(list.get(position).getPhoto());

@@ -92,6 +92,14 @@ public class MetaContactRec implements MetaContact, Account {
     }
 
     @Override
+    public String getAccountId(SocialNetwork network) {
+        for(Account account: getAccounts()){
+            if(network.equals(account.getNet())) return account.getId();
+        }
+        return null;
+    }
+
+    @Override
     public boolean containAccount(Account account) {
         for(Account acc: accounts){
             if(acc.getId().equals(account.getId())) return true;

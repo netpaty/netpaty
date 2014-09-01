@@ -19,6 +19,8 @@ import com.facebook.widget.LoginButton;
 import com.netparty.R;
 import com.netparty.enums.SocialNetwork;
 import com.netparty.interfaces.Account;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.api.VKError;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,6 +93,26 @@ public class AccountActivity extends AbstractActivity {
 
     @Override
     protected void onGoogleConnectionFailed() {
+
+    }
+
+    @Override
+    protected void onVKTokenExpired(VKAccessToken expiredToken) {
+
+    }
+
+    @Override
+    protected void onVKAccessDenied(VKError authorizationError) {
+
+    }
+
+    @Override
+    protected void onVKReceiveNewToken(VKAccessToken newToken) {
+
+    }
+
+    @Override
+    protected void onVKAcceptUserToken(VKAccessToken token) {
 
     }
 

@@ -1,6 +1,5 @@
 package com.netparty.viewers;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,6 +13,9 @@ import android.support.v4.app.FragmentActivity;
 
 import com.facebook.Session;
 import com.netparty.services.NPService;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKUIHelper;
+import com.vk.sdk.api.VKError;
 
 
 public abstract class AbstractActivity extends FragmentActivity {
@@ -32,12 +34,14 @@ public abstract class AbstractActivity extends FragmentActivity {
 
     protected void onServiceConnected(){
         registerReceiver(googleEventReceiver, new IntentFilter(NPService.GOOGLE_EVENT));
+        registerReceiver(vkEventReceiver, new IntentFilter(NPService.VK_EVENT));
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bindService(new Intent(this, NPService.class), connection, Context.BIND_AUTO_CREATE);
+        VKUIHelper.onCreate(this);
     }
 
     protected ServiceConnection connection = new ServiceConnection() {
@@ -55,6 +59,9 @@ public abstract class AbstractActivity extends FragmentActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        VKUIHelper.onActivityResult(requestCode, resultCode, data);
+
         if(Session.getActiveSession() != null) Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
         if (requestCode == LoginActivity.REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {
             if(getService() != null && getService().getPlusClient() != null) getService().getPlusClient().connect();
@@ -91,7 +98,7 @@ public abstract class AbstractActivity extends FragmentActivity {
     protected void onDestroy(){
         isActive = false;
         super.onDestroy();
-        unregisterGoogleReceiver();
+        unregisterReceivers();
         unbindService(connection);
     }
 
@@ -113,15 +120,46 @@ public abstract class AbstractActivity extends FragmentActivity {
         }
     };
 
+    private BroadcastReceiver vkEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String event = intent.getStringExtra(NPService.VK_EVENT);
+            if(event.equals(NPService.VK_TOKEN_EXPIRED)){
+                onVKTokenExpired(getService().getVkToken());
+            }
+            else
+            if (event.equals(NPService.VK_ACCESS_DENIED)){
+                onVKAccessDenied(getService().getVkError());
+            }
+            else
+            if (event.equals(NPService.VK_ACCEPT_TOKEN)){
+                onVKAcceptUserToken(getService().getVkToken());
+            }
+            else
+            if (event.equals(NPService.VK_RECEIVED_TOKEN)){
+                onVKReceiveNewToken(getService().getVkToken());
+            }
+        }
+    };
+
     protected abstract void onGoogleConnected();
 
     protected abstract void onGoogleDisconnected();
 
     protected abstract void onGoogleConnectionFailed();
 
-    protected void unregisterGoogleReceiver(){
+    protected abstract void onVKTokenExpired(VKAccessToken expiredToken);
+
+    protected abstract void onVKAccessDenied(VKError authorizationError);
+
+    protected abstract void onVKReceiveNewToken(VKAccessToken newToken);
+
+    protected abstract void onVKAcceptUserToken(VKAccessToken token);
+
+    protected void unregisterReceivers(){
         try{
             unregisterReceiver(googleEventReceiver);
+            unregisterReceiver(vkEventReceiver);
         }
         catch (IllegalArgumentException e){
 

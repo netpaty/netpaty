@@ -33,6 +33,18 @@ import com.netparty.utils.db.DataBaseAdapter;
 
 import com.facebook.*;
 import com.facebook.model.*;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKScope;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.VKUIHelper;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiUser;
+import com.vk.sdk.api.model.VKList;
 
 import java.util.Arrays;
 
@@ -44,9 +56,14 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     private ConnectionResult mConnectionResult;
     private SignInButton plusButton;
 
+    private Button vkBtn;
+
     private boolean firstSignIn = true, processLogin = true;
 
     public static final int REQUEST_CODE_RESOLVE_ERR = 9000;
+
+
+    private static String[] sMyScope = new String[]{VKScope.FRIENDS, VKScope.WALL, VKScope.PHOTOS};
 
     private DataBaseAdapter dbAdapter;
 
@@ -66,6 +83,14 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     protected void onServiceConnected() {
         super.onServiceConnected();
         mPlusClient = getService().getPlusClient();
+        if (VKSdk.isLoggedIn()) {
+            vkBtn.setText(getString(R.string.logout));
+        } else {
+            vkBtn.setText(getString(R.string.login_with_vk));
+        }
+        if (VKSdk.wakeUpSession()) {
+            vkBtn.setText(getString(R.string.logout));
+        }
 
         String lastMCId = preferences.getString(LAST_MC_ID, "");
         if(!"".equals(lastMCId)) {
@@ -83,7 +108,6 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
         setContentView(R.layout.layout_login);
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(saveInstanceState);
-
         preferences = this.getSharedPreferences(PREFERENCES,
                 Activity.MODE_PRIVATE);
         editor = preferences.edit();
@@ -95,12 +119,18 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
 
         plusButton.setOnClickListener(this);
 
+
         googleSignOutBtn = (Button)findViewById(R.id.sign_out_button);
         googleSignOutBtn.setOnClickListener(this);
 
         faceBookLoginBtn = (LoginButton)findViewById(R.id.authButton);
         faceBookLoginBtn.setReadPermissions(Arrays.asList("user_friends", "friends_online_presence",
                 "friends_online_presence"));
+
+        vkBtn = (Button)findViewById(R.id.vk_button);
+        vkBtn.setOnClickListener(this);
+
+
 
         hint = (TextView)findViewById(R.id.hint);
         loginBtn = (Button)findViewById(R.id.app_login);
@@ -110,6 +140,7 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
         dbAdapter.showDB();
 
     }
+
 
 
     @Override
@@ -125,6 +156,7 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     public void onResume() {
         super.onResume();
         uiHelper.onResume();
+        VKUIHelper.onResume(this);
 
     }
 
@@ -140,7 +172,8 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     public void onDestroy() {
         super.onDestroy();
         uiHelper.onDestroy();
-        unregisterGoogleReceiver();
+        unregisterReceivers();
+        VKUIHelper.onDestroy(this);
 
     }
 
@@ -175,6 +208,44 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
                 mPlusClient.connect();
             }
         }
+    }
+
+    @Override
+    protected void onVKTokenExpired(VKAccessToken expiredToken) {
+        VKSdk.authorize(sMyScope);
+    }
+
+    @Override
+    protected void onVKAccessDenied(VKError authorizationError) {
+        vkBtn.setText(getString(R.string.login_with_vk));
+    }
+
+    @Override
+    protected void onVKReceiveNewToken(VKAccessToken newToken) {
+        vkConnected(newToken);
+    }
+
+    @Override
+    protected void onVKAcceptUserToken(VKAccessToken token) {
+        vkConnected(token);
+    }
+
+    private void vkConnected(VKAccessToken token){
+        vkBtn.setText(getString(R.string.logout));
+
+        VKApi.users().get().executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                VKList<VKApiUser> users = (VKList<VKApiUser>)response.parsedModel;
+                if(users != null && users.size()>0) {
+                    VKApiUser user = users.get(0);
+                    onSocialNetworkLogin(new AccountRec(SocialNetwork.VK, String.valueOf(user.getId()),
+                            user.first_name + " " + user.last_name));
+
+
+                }
+            }
+        });
     }
 
     @Override
@@ -263,7 +334,7 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     private void loginNetParty(){
         MetaContact mc = getService().getMetaContact();
         if(mc != null && mc.getAccounts().size()>0){
-            unregisterGoogleReceiver();
+            unregisterReceivers();
             dbAdapter.updateOrAddMetaContact(mc);
             editor.putString(LAST_MC_ID, mc.getId());
             editor.commit();
@@ -302,7 +373,6 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.sign_in_button && !mPlusClient.isConnected()) {
-            Log.e("tag", "ConnectBtn clicked ");
             mConnectionProgressDialog.show();
             mPlusClient.connect();
         }
@@ -315,9 +385,7 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
             else Log.e("tag", "MC is empty");
         }
         if(v.getId() == R.id.sign_out_button){
-            Log.e("tag", "sign out");
             if (mPlusClient.isConnected()) {
-                Log.e("tag", "sign if");
                 mPlusClient.clearDefaultAccount();
                 mPlusClient.revokeAccessAndDisconnect(new PlusClient.OnAccessRevokedListener() {
                     @Override
@@ -327,6 +395,14 @@ public class LoginActivity extends AbstractActivity implements View.OnClickListe
                 });
                 plusButton.setVisibility(View.VISIBLE);
                 googleSignOutBtn.setVisibility(View.GONE);
+            }
+        }
+        if(v.getId() == R.id.vk_button){
+            if (VKSdk.isLoggedIn()) {
+                VKSdk.logout();
+                vkBtn.setText(getString(R.string.login_with_vk));
+            } else {
+                VKSdk.authorize(sMyScope);
             }
         }
     }
